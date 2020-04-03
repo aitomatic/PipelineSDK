@@ -1,3 +1,3 @@
-from arimo.pipeline import stepfunctions, main
+from arimo.pipeline import main, stepfunctions, lambda_fn
 
 main.cli()

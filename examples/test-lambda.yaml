@@ -1,0 +1,6 @@
+FunctionName: test_lambda
+Runtime: python3.8
+Handler: test-lambda-function.lambda_handler
+Code:
+  FunctionCodeFiles: test-lambda-function.py
+Description: Hello
