@@ -3,7 +3,6 @@ from io import BytesIO
 import boto3
 import click
 import glob
-import json
 import zipfile
 
 from arimo.pipeline.main import cli
@@ -22,7 +21,9 @@ def generate_zip(files):
         for file in files:
             with open(file, 'rb') as f:
                 data = BytesIO(f.read())
-            zf.writestr(file, data.getvalue())
+            zinfo = zipfile.ZipInfo(file)
+            zinfo.external_attr = 0o777 << 16
+            zf.writestr(zinfo, data.getvalue())
 
     return mem_zip.getvalue()
 
