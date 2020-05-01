@@ -28,9 +28,11 @@ def sfn():
 def create(file, out_json):
     o = load_yaml(file)
     definition = json.dumps(o['definition'], indent=2)
+    tags = o['tags']
     response = client.create_state_machine(
         name=o.get('name'),
         definition=definition,
+        tags=tags,
         roleArn=ROLE_ARN,
     )
     print(response)

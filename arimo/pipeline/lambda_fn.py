@@ -81,6 +81,15 @@ def update(file):
         )
         print(response)
 
+    tags = o.get('Tags')
+    if tags:
+        region = o['AWS_REGION']
+        response = client.tag_resource(
+            Resource="arn:aws:lambda:%s:394497726199:function:%s" % (region, name),
+            Tags=tags
+        )
+        print(response)
+
 
 @lambda_fn.command()
 @click.option('--name', prompt='Name')

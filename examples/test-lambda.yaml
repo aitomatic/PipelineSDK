@@ -4,3 +4,8 @@ Handler: test-lambda-function.lambda_handler
 Code:
   FunctionCodeFiles: test-lambda-function.py
 Description: Hello
+Tags:
+  Project: Test
+  Name: Test
+  Environment: DEV
+AWS_REGION: ap-northeast-1
