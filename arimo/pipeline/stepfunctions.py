@@ -28,7 +28,7 @@ def sfn():
 def create(file, out_json):
     o = load_yaml(file)
     definition = json.dumps(o['definition'], indent=2)
-    tags = o['tags']
+    tags = [{'key': k, 'value': o['tags'][k]} for k in o['tags']]
     response = client.create_state_machine(
         name=o.get('name'),
         definition=definition,
