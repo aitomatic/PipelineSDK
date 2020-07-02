@@ -1,4 +1,5 @@
 FunctionName: test_lambda
+Role: arn:aws:iam::394497726199:role/pipeline-lambda-role
 Runtime: python3.8
 Handler: test-lambda-function.lambda_handler
 Code:

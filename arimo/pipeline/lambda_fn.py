@@ -1,31 +1,13 @@
-from io import BytesIO
+from urllib.parse import urlparse
 
 import boto3
 import click
-import glob
-import zipfile
 
 from arimo.pipeline.main import cli
 from arimo.pipeline.utils import load_yaml
 
 client = boto3.client('lambda')
 s3_resource = boto3.resource('s3')
-
-ARN_ROLE = "arn:aws:iam::394497726199:role/pipeline-sdk-lambda-role"
-
-
-def generate_zip(files):
-    mem_zip = BytesIO()
-
-    with zipfile.ZipFile(mem_zip, mode="w", compression=zipfile.ZIP_DEFLATED) as zf:
-        for file in files:
-            with open(file, 'rb') as f:
-                data = BytesIO(f.read())
-            zinfo = zipfile.ZipInfo(file)
-            zinfo.external_attr = 0o777 << 16
-            zf.writestr(zinfo, data.getvalue())
-
-    return mem_zip.getvalue()
 
 
 @cli.group(name="lambda")
@@ -38,14 +20,21 @@ def lambda_fn():
 def create(file):
     o = load_yaml(file)
     name = o['FunctionName']
-    code_dir = o.get('Code')['FunctionCodeFiles']
+    role = o['Role']
+
+    zip_file = o['Code']['ZipFile']
+    assert 's3://' in zip_file
+    prs = urlparse(zip_file)
+    s3_bucket, s3_key = prs.netloc, prs.path[1:]
+
     response = client.create_function(
         FunctionName=name,
         Runtime=o.get('Runtime', 'python3.8'),
-        Role=ARN_ROLE,
+        Role=role,
         Handler=o['Handler'],
         Code={
-            "ZipFile": generate_zip(glob.glob(code_dir))
+            "S3Bucket": s3_bucket,
+            "S3Key": s3_key
         },
         Description=o.get('Description', ''),
         Timeout=o.get('Timeout', 3),
@@ -63,13 +52,19 @@ def create(file):
 def update(file):
     o = load_yaml(file)
     name = o['FunctionName']
+    role = o['Role']
 
     code = o.get('Code')
     if code:
-        code_dir = code['FunctionCodeFiles']
+        zip_file = code['ZipFile']
+        assert 's3://' in zip_file
+        prs = urlparse(zip_file)
+        s3_bucket, s3_key = prs.netloc, prs.path[1:]
+
         response = client.update_function_code(
             FunctionName=name,
-            ZipFile=generate_zip(glob.glob(code_dir))
+            S3Bucket=s3_bucket,
+            S3Key=s3_key
         )
         print(response)
 
@@ -77,6 +72,7 @@ def update(file):
     if handler:
         response = client.update_function_configuration(
             FunctionName=name,
+            Role=role,
             Handler=o['Handler']
         )
         print(response)
@@ -85,7 +81,7 @@ def update(file):
     if tags:
         region = o['AWS_REGION']
         response = client.tag_resource(
-            Resource="arn:aws:lambda:%s:394497726199:function:%s" % (region, name),
+            Resource="arn:aws:lambda:%s:905988898753:function:%s" % (region, name),
             Tags=tags
         )
         print(response)
