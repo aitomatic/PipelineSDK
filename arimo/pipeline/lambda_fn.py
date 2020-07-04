@@ -7,7 +7,11 @@ from arimo.pipeline.main import cli
 from arimo.pipeline.utils import load_yaml
 
 client = boto3.client('lambda')
+sts = boto3.client('sts')
 s3_resource = boto3.resource('s3')
+
+aws_account = sts.get_caller_identity().get('Account')
+aws_role_arn = "arn:aws:iam::%s:role/pipeline-lambda-role" % aws_account
 
 
 @cli.group(name="lambda")
@@ -20,7 +24,7 @@ def lambda_fn():
 def create(file):
     o = load_yaml(file)
     name = o['FunctionName']
-    role = o['Role']
+    role = aws_role_arn
 
     zip_file = o['Code']['ZipFile']
     assert 's3://' in zip_file
@@ -52,7 +56,7 @@ def create(file):
 def update(file):
     o = load_yaml(file)
     name = o['FunctionName']
-    role = o['Role']
+    role = aws_role_arn
 
     code = o.get('Code')
     if code:

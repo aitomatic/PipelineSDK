@@ -6,8 +6,12 @@ from arimo.pipeline.main import cli
 from arimo.pipeline.utils import load_yaml
 
 client = boto3.client('stepfunctions')
+sts = boto3.client('sts')
 
 STATE_MACHINE_ARN_PREFIX = "arn:aws:states:ap-northeast-1:905988898753:stateMachine:"
+
+aws_account = sts.get_caller_identity().get('Account')
+aws_role_arn = "arn:aws:iam::%s:role/pipeline-states-role" % aws_account
 
 
 def write_json(filename, data):
@@ -26,7 +30,7 @@ def sfn():
 @click.option('--out-json/--no-out-json', default=False)
 def create(file, out_json):
     o = load_yaml(file)
-    role_arn = o['role_arn']
+    role_arn = aws_role_arn
     definition = json.dumps(o['definition'], indent=2)
     tags = [{'key': k, 'value': o['tags'][k]} for k in o['tags']]
     response = client.create_state_machine(
@@ -45,7 +49,7 @@ def create(file, out_json):
 @click.option('--out-json/--no-out-json', default=False)
 def update(file, out_json):
     o = load_yaml(file)
-    role_arn = o['role_arn']
+    role_arn = aws_role_arn
     state_machine_arn = STATE_MACHINE_ARN_PREFIX + o['name']
     definition = json.dumps(o['definition'], indent=2)
     response = client.update_state_machine(

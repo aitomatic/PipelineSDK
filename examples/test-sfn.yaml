@@ -1,5 +1,4 @@
 name: test-sfn
-role_arn: arn:aws:iam::394497726199:role/pipeline-states-role
 definition:
   Comment: A Hello World example of the Amazon States Language using Pass states
   StartAt: Hello
