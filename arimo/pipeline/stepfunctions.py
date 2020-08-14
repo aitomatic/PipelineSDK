@@ -8,10 +8,9 @@ from arimo.pipeline.utils import load_yaml
 client = boto3.client('stepfunctions')
 sts = boto3.client('sts')
 
-STATE_MACHINE_ARN_PREFIX = "arn:aws:states:ap-northeast-1:905988898753:stateMachine:"
-
 aws_account = sts.get_caller_identity().get('Account')
 aws_role_arn = "arn:aws:iam::%s:role/pipeline-states-role" % aws_account
+state_arn_prefix = "arn:aws:states:ap-northeast-1:%s:stateMachine:" % aws_account
 
 
 def write_json(filename, data):
@@ -50,7 +49,7 @@ def create(file, out_json):
 def update(file, out_json):
     o = load_yaml(file)
     role_arn = aws_role_arn
-    state_machine_arn = STATE_MACHINE_ARN_PREFIX + o['name']
+    state_machine_arn = state_arn_prefix + o['name']
     definition = json.dumps(o['definition'], indent=2)
     response = client.update_state_machine(
         stateMachineArn=state_machine_arn,
@@ -65,7 +64,7 @@ def update(file, out_json):
 @sfn.command()
 @click.option('--name', prompt='Name')
 def delete(name):
-    state_machine_arn = STATE_MACHINE_ARN_PREFIX + name
+    state_machine_arn = state_arn_prefix + name
     response = client.delete_state_machine(
         stateMachineArn=state_machine_arn
     )
@@ -76,7 +75,7 @@ def delete(name):
 @click.option('--name', prompt='Name')
 @click.option('--input-file')
 def start(name, input_file):
-    state_machine_arn = STATE_MACHINE_ARN_PREFIX + name
+    state_machine_arn = state_arn_prefix + name
     input_json = {}
     if input_file:
         with open(input_file) as f:
