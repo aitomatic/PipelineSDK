@@ -85,7 +85,7 @@ def update(file):
     if tags:
         region = o['AWS_REGION']
         response = client.tag_resource(
-            Resource="arn:aws:lambda:%s:905988898753:function:%s" % (region, name),
+            Resource="arn:aws:lambda:%s:%s:function:%s" % (region, aws_account, name),
             Tags=tags
         )
         print(response)
