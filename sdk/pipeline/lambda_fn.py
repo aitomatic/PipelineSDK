@@ -3,8 +3,8 @@ from urllib.parse import urlparse
 import boto3
 import click
 
-from arimo.pipeline.main import cli
-from arimo.pipeline.utils import load_yaml
+from sdk.pipeline.main import cli
+from sdk.pipeline.utils import load_yaml
 
 client = boto3.client('lambda')
 sts = boto3.client('sts')
