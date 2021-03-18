@@ -1,0 +1,6 @@
+jobName: test
+jobQueue: test
+arrayProperties:
+  size: 2
+timeout:
+  attemptDurationSeconds: 15

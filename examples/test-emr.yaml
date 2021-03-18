@@ -1,0 +1,23 @@
+Name: test-emr
+ReleaseLabel: emr-6.0.0
+Instances:
+  InstanceGroups:
+    - Name: MASTER
+      InstanceRole: MASTER
+      InstanceType: c5.xlarge
+      InstanceCount: 1
+    - Name: CORE
+      InstanceRole: CORE
+      InstanceType: c5.xlarge
+      InstanceCount: 1
+Steps:
+  - Name: Test
+    ActionOnFailure: TERMINATE_CLUSTER
+    HadoopJarStep:
+      Jar: string
+      MainClass: string
+      Args:
+        - 100
+Tags:
+  Project: Test
+  Environment: DEV
