@@ -1,9 +1,9 @@
-## Install
+## Setup
 ```
 pip install -e .
 ```
 
-## Functions
+## Features
 
 ### StepFunctions
 - create: `aws stepfunctions create-state-machine`
