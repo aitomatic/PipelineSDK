@@ -3,7 +3,7 @@
 pip install -e .
 ```
 
-## Features
+## Supported AWS Functions
 
 ### StepFunctions
 - create: `aws stepfunctions create-state-machine`
